@@ -15,7 +15,6 @@ pip install tensorflow-gpu    (GPU version)
 ```
 python bin/start.py
 ```
-```
 
 **Dataset**
 * Because of data confidentiality, the full dataset are not provided herein, but I provide a small dataset (100 * 100 * 200)  in the folder `db` for test and play with the code.
