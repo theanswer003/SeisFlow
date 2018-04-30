@@ -22,9 +22,9 @@ regularization_weight = HYPER_PARAS['regularization_weight']
 
 # define the computing devices
 if 0 == ngpu:
-    devices = ['cpu:0']
+    devices = ['/cpu:0']
 else:
-    devices = ['gpu:%d'%i for i in range(ngpu)]
+    devices = ['/gpu:%d'%i for i in range(ngpu)]
 
 def run():
     wavelet = np.load(DATAPATH['wavelet'])
