@@ -7,6 +7,9 @@ sys.path.append(base_dir)
 
 from core import main
 
+os.makedirs('results', exist_ok=True)
+os.makedirs('graphs', exist_ok=True)
+
 if __name__ == '__main__':
     main.run()
 
