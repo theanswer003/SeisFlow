@@ -10,7 +10,10 @@ ngpu = DEVICE_PARAS['gpu_num']           # number of gpu available, if 0, CPU wi
 nsim = SIMULATION_PARAS['sim_num']       # number of realizations
 graph_path = OUTPUT['graphs']            # path of data flow graph
 
-nsim_per_gpu = nsim // ngpu
+if 0 == ngpu:
+    nsim_per_gpu = nsim
+else:
+    nsim_per_gpu = nsim // ngpu
 
 lhx = SIMULATION_PARAS['lhx']            # correlation range in X direction
 lhy = SIMULATION_PARAS['lhy']            # correlation range in Y direction
@@ -21,10 +24,10 @@ training_steps = HYPER_PARAS['training_steps']   # updating steps
 regularization_weight = HYPER_PARAS['regularization_weight']
 
 # define the computing devices
-if 0 == ngpu:
-    devices = ['/cpu:0']
-else:
-    devices = ['/gpu:%d'%i for i in range(ngpu)]
+# if 0 == ngpu:
+#     devices = ['/cpu:0']
+# else:
+#     devices = ['/gpu:%d'%i for i in range(ngpu)]
 
 def run():
     wavelet = np.load(DATAPATH['wavelet'])
@@ -32,16 +35,25 @@ def run():
     init_AI = np.load(DATAPATH['init_AI'])     # nsample, nline, ncdp
 
     for epoch in range(nsim_per_gpu):
+        print(epoch)
         tf.reset_default_graph()      # clear the tensorflow graph
 
         models = []
 
-        for i in range(ngpu):
-            with tf.device(devices[i]):  # allocate computing devices for different models
-                with tf.name_scope('Realization_%d' % (i + epoch * ngpu)):
+        if 0 != ngpu:
+            for i in range(ngpu):
+                with tf.device('/gpu:%d'%i):  # allocate computing devices for different models
+                    with tf.name_scope('Realization_%d' % (i + epoch * ngpu)):
+                        model = Model(wavelet, seismic, init_AI,
+                                    regularization_weight=regularization_weight,
+                                    learning_rate=learning_rate)
+                        models.append(model)
+        else:
+            with tf.device('/cpu:0'):  # allocate computing devices for different models
+                with tf.name_scope('Realization_%d' % epoch):
                     model = Model(wavelet, seismic, init_AI,
-                                  regularization_weight=regularization_weight,
-                                  learning_rate=learning_rate)
+                                regularization_weight=regularization_weight,
+                                learning_rate=learning_rate)
                     models.append(model)
 
         # create a session to run the data flow graph

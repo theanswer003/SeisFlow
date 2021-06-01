@@ -5,7 +5,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEVICE_PARAS = {
-    'gpu_num': 1                               # number of gpu available, if 0, CPU will be used for computation.
+    'gpu_num': 0                               # number of gpu available, if 0, CPU will be used for computation.
 }
 
 DATABASE = {
